@@ -6,11 +6,11 @@
 #define PHILUXAVR_IO_H
 
 typedef struct {
-		int (*read)(char *p);
+		int (*read)(char *b);
 } io_reader;
 
 typedef struct {
-		int (*write)(char *p);
+		int (*write)(char b);
 } io_writer;
 
 #endif //PHILUXAVR_IO_H

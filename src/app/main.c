@@ -4,6 +4,7 @@
 
 #include <usart/usart.h>
 #include <cli/cli.h>
+#include <avr/io.h>
 
 int main() {
 	cli *c = new_cli(new_usart_reader(), new_usart_writer());

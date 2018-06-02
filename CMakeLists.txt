@@ -22,6 +22,7 @@ cmake_minimum_required(VERSION 2.8)
 set(AVR_UPLOADTOOL avrdude)
 set(AVR_PROGRAMMER ponyser)
 set(AVR_UPLOADTOOL_PORT /dev/ttyUSB0)
+set(AVR_UPLOADTOOL_OPTIONS -i 1000 -F -B .5 -b 9600)
 
 ##########################################################################
 # AVR and fuses needs to be set
@@ -70,7 +71,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 # needs to be defined for AVR toolchain
 ##########################################################################
 set(MCU_SPEED "8000000UL")
-set(SERIAL_SPEED "19200")
+set(SERIAL_SPEED "9600")
 
 ##########################################################################
 # some cmake cross-compile necessities
@@ -129,6 +130,7 @@ add_definitions("-DF_CPU=${MCU_SPEED}")
 add_definitions("-DUSART_BAUDRATE=${SERIAL_SPEED}")
 add_definitions("-fpack-struct")
 add_definitions("-fshort-enums")
+add_definitions("-Os")
 add_definitions("-Wall")
 add_definitions("-Werror")
 add_definitions("-pedantic")
