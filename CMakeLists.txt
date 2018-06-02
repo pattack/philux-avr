@@ -70,6 +70,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 # needs to be defined for AVR toolchain
 ##########################################################################
 set(MCU_SPEED "8000000UL")
+set(SERIAL_SPEED "19200")
 
 ##########################################################################
 # some cmake cross-compile necessities
@@ -125,6 +126,7 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 # compiler options for all build types
 ##########################################################################
 add_definitions("-DF_CPU=${MCU_SPEED}")
+add_definitions("-DUSART_BAUDRATE=${SERIAL_SPEED}")
 add_definitions("-fpack-struct")
 add_definitions("-fshort-enums")
 add_definitions("-Wall")
