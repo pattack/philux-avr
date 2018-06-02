@@ -6,16 +6,16 @@
 
 #include <stdlib.h>
 
-static void execute(struct cli* c) {
-    for(;;) {
-    }
+static void execute(struct cli *c) {
+	for (;;) {
+	}
 }
 
-extern cli* new_cli(io_reader* r, io_writer* w) {
-    cli* c = malloc(sizeof(cli));
-    c->w = w;
-    c->r = r;
-    c->execute = execute;
+extern cli *new_cli(io_reader *r, io_writer *w) {
+	cli *c = malloc(sizeof(cli));
+	c->w = w;
+	c->r = r;
+	c->execute = execute;
 
-    return c;
+	return c;
 }
