@@ -1,0 +1,11 @@
+/schema/*.pdsbak
+/schema/*.workspace
+
+.idea/
+*.iml
+.DS_Store
+.cproject
+.project
+.settings/
+
+cmake-build-*/
