@@ -11,11 +11,11 @@
 
 #include <util/delay.h>
 
-static int cli_puts(io_writer *w, char *str) {
+static int cli_puts(cli *c, char *str) {
 	int count;
 
 	for (count = 0; '\0' != str[count]; count++) {
-		if (0 == w->write(str[count])) {
+		if (0 == c->w->write(str[count])) {
 			break;
 		}
 	}
@@ -23,15 +23,41 @@ static int cli_puts(io_writer *w, char *str) {
 	return count;
 }
 
-static int cli_gets(io_reader *r, char **str) {
+static int cli_gets(cli *c, char *str) {
 	int count = 0;
 
 	char b;
-	while (1 == r->read(&b)) {
-		if ('\n' == b) {
-			break;
-		} else {
-			*str[count++] = b;
+	for (char finished = 0; 0 == finished;) {
+		if (1 == c->r->read(&b)) {
+			char echo = 1;
+
+			switch (b) {
+				case '\r':
+				case '\n':
+					finished = 1;
+					break;
+
+				case '\t':
+					// TODO: Print help
+					break;
+
+				case '\b':
+					if (0 == count) {
+						echo = 0;
+					} else {
+						str[--count] = '\0';
+					}
+					break;
+
+				default:
+					str[count++] = b;
+					str[count] = '\0';
+					break;
+			}
+
+			if (1 == echo) {
+				c->w->write(b);
+			}
 		}
 	}
 
@@ -39,18 +65,18 @@ static int cli_gets(io_reader *r, char **str) {
 }
 
 static void execute(struct cli *c) {
-	char *command = (char *) malloc(256 * sizeof(char));
-	char *buf = (char *) malloc(512 * sizeof(char));
-
 	for (;;) {
-		cli_puts(c->w, "$ ");
+		cli_puts(c, "$ ");
 
-		_delay_ms(1000);
+		// Read command
+		char command[256];
+		cli_gets(c, command);
+
+		// Write results
+		char buf[300];
+		sprintf(buf, "Command: %s\r\n", command);
+		cli_puts(c, buf);
 	}
-
-	cli_gets(c->r, &command);
-	sprintf(buf, "Command: %s\n", command);
-	cli_puts(c->w, buf);
 }
 
 extern cli *new_cli(io_reader *r, io_writer *w) {

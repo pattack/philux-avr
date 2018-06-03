@@ -44,7 +44,7 @@ static void init(uint16_t baud_prescale) {
 	sei();
 }
 
-int push(uint8_t buf[USART_BUFFER_SIZE], uint8_t b) {
+int push(uint8_t *buf, uint8_t b) {
 	for (uint8_t i = 0; i < (USART_BUFFER_SIZE - 1); i++) {
 		if ('\0' == buf[i]) {
 			buf[i] = b;
@@ -57,7 +57,7 @@ int push(uint8_t buf[USART_BUFFER_SIZE], uint8_t b) {
 	return 0;
 }
 
-uint8_t shift(uint8_t buf[USART_BUFFER_SIZE]) {
+uint8_t shift(uint8_t *buf) {
 	if ('\0' == buf[0]) {
 		return 0;
 	}
@@ -65,7 +65,7 @@ uint8_t shift(uint8_t buf[USART_BUFFER_SIZE]) {
 	uint8_t b = buf[0];
 
 	// Shift array to Left
-	for (uint8_t i = 0; i < (USART_BUFFER_SIZE / 2); i++) {
+	for (uint8_t i = 0; i < (USART_BUFFER_SIZE - 1); i++) {
 		buf[i] = buf[i + 1];
 	}
 
@@ -143,10 +143,7 @@ ISR(USART_RXC_vect) {
 		// No error occured
 
 		// push to input buffer
-		if (0 != push(ibuf, b)) {
-			// Echo back the received byte to show the typed character
-			write(b);
-		}
+		push(ibuf, b);
 	}
 }
 
