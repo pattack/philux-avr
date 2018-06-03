@@ -9,7 +9,7 @@
 int main() {
 	cli *c = new_cli(new_usart_reader(), new_usart_writer());
 
-	// Main loop
+	// Run CLI
 	c->execute(c);
 
 	return 0;

@@ -17,10 +17,10 @@ uint8_t ibuf[USART_BUFFER_SIZE], obuf[USART_BUFFER_SIZE];
 
 static void init(uint16_t baud_prescale) {
 	// Initialize buffers
-//	ibuf = (uint8_t*) malloc(USART_BUFFER_SIZE * sizeof(uint8_t));
+	// ibuf = (uint8_t*) malloc(USART_BUFFER_SIZE * sizeof(uint8_t));
 	memset(ibuf, '\0', USART_BUFFER_SIZE * sizeof(uint8_t));
 
-//	obuf = (uint8_t*) malloc(USART_BUFFER_SIZE * sizeof(uint8_t));
+	// obuf = (uint8_t*) malloc(USART_BUFFER_SIZE * sizeof(uint8_t));
 	memset(obuf, '\0', USART_BUFFER_SIZE * sizeof(uint8_t));
 
 	// Set baud rate

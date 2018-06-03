@@ -72,6 +72,8 @@ static void execute(struct cli *c) {
 		char command[256];
 		cli_gets(c, command);
 
+		// TODO: Dispatch command
+
 		// Write results
 		char buf[300];
 		sprintf(buf, "Command: %s\r\n", command);

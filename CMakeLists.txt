@@ -71,7 +71,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 # needs to be defined for AVR toolchain
 ##########################################################################
 set(MCU_SPEED "8000000UL")
-set(SERIAL_SPEED "9600")
+set(SERIAL_SPEED "19200")
 
 ##########################################################################
 # some cmake cross-compile necessities
