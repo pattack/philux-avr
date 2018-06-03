@@ -94,7 +94,7 @@ static int read(char *p) {
 }
 
 extern io_reader *new_usart_reader() {
-	io_reader *r = malloc(sizeof(io_reader));
+	io_reader *r = (io_reader*) malloc(sizeof(io_reader));
 	r->read = read;
 
 	init(USART_BAUD_PRESCALE);
@@ -120,7 +120,7 @@ static int write(char b) {
 }
 
 extern io_writer *new_usart_writer() {
-	io_writer *w = malloc(sizeof(io_writer));
+	io_writer *w = (io_writer*) malloc(sizeof(io_writer));
 	w->write = write;
 
 	init(USART_BAUD_PRESCALE);

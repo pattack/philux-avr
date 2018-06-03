@@ -2,14 +2,12 @@
 // Created by pouyan on 6/2/18.
 //
 
-#include "cli.h"
-#include <io/io.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/delay.h>
+#include "cli.h"
+#include <io/io.h>
 
 static int cli_puts(cli *c, char *str) {
 	int count;
@@ -34,9 +32,9 @@ static int cli_gets(cli *c, char *str) {
 			switch (b) {
 				case 3: // ^C
 					strcpy(str, "");
-					b = '\r';
-					finished = 1;
-					break;
+							b = '\r';
+							finished = 1;
+							break;
 
 				case 4: // ^D
 					break;
@@ -44,7 +42,7 @@ static int cli_gets(cli *c, char *str) {
 				case '\r':
 				case '\n':
 					finished = 1;
-					break;
+							break;
 
 				case '\t':
 					// TODO: Print help
@@ -56,14 +54,14 @@ static int cli_gets(cli *c, char *str) {
 					} else {
 						str[--count] = '\0';
 					}
-					break;
+							break;
 
 				default:
 					if (b > 31) {
 						str[count++] = b;
 						str[count] = '\0';
 					}
-					break;
+							break;
 			}
 
 			if (1 == echo) {
@@ -75,28 +73,62 @@ static int cli_gets(cli *c, char *str) {
 	return count;
 }
 
-static void execute(struct cli *c) {
+static void cli_handle(cli *c, const char *command) {
+	char buf[300] = "";
+
+	// TODO: Dispatch command
+	{
+		sprintf(buf, "command not found: %s\r\n", command);
+	}
+
+	// Write results
+	cli_puts(c, buf);
+}
+
+static void cli_execute(cli *c) {
 	for (;;) {
-		cli_puts(c, "$ ");
+		cli_puts(c, "# ");
 
 		// Read command
-		char command[256] = "";
-		cli_gets(c, command);
+		char cmd[256] = "";
+		cli_gets(c, cmd);
 
-		// TODO: Dispatch command
+		// Handle command
+		cli_handle(c, cmd);
+	}
+}
 
-		// Write results
-		char buf[300] = "";
-		sprintf(buf, "Command: %s\r\n", command);
-		cli_puts(c, buf);
+static void cli_add_handler(cli *c, const char *name, command fn) {
+	static int count;
+
+	count++;
+
+	c->handlers = (command*) realloc(c->handlers, count * sizeof(command));
+	c->handlers[count - 1] = fn;
+
+	c->cmd_names = (const char**) realloc(c->cmd_names, count * sizeof(const char*));
+	for (int i = 0; i < count; i++) {
+		// Last empty home or current home
+		if (count == (i + 1) || strcmp(c->cmd_names[i], name) > 0) {
+			for (int j = count - 1; j > i; j--) {
+				c->cmd_names[j] = c->cmd_names[j - 1];
+			}
+
+			c->cmd_names[i] = name;
+
+			break;
+		}
 	}
 }
 
 extern cli *new_cli(io_reader *r, io_writer *w) {
-	cli *c = malloc(sizeof(cli));
+	cli *c = (cli*) malloc(sizeof(cli));
 	c->w = w;
 	c->r = r;
-	c->execute = execute;
+	c->add_handler = cli_add_handler;
+	c->execute = cli_execute;
+	c->puts = cli_puts;
+	c->gets = cli_gets;
 
 	return c;
 }
