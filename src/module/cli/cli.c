@@ -32,6 +32,15 @@ static int cli_gets(cli *c, char *str) {
 			char echo = 1;
 
 			switch (b) {
+				case 3: // ^C
+					strcpy(str, "");
+					b = '\r';
+					finished = 1;
+					break;
+
+				case 4: // ^D
+					break;
+
 				case '\r':
 				case '\n':
 					finished = 1;
@@ -50,8 +59,10 @@ static int cli_gets(cli *c, char *str) {
 					break;
 
 				default:
-					str[count++] = b;
-					str[count] = '\0';
+					if (b > 31) {
+						str[count++] = b;
+						str[count] = '\0';
+					}
 					break;
 			}
 
@@ -69,13 +80,13 @@ static void execute(struct cli *c) {
 		cli_puts(c, "$ ");
 
 		// Read command
-		char command[256];
+		char command[256] = "";
 		cli_gets(c, command);
 
 		// TODO: Dispatch command
 
 		// Write results
-		char buf[300];
+		char buf[300] = "";
 		sprintf(buf, "Command: %s\r\n", command);
 		cli_puts(c, buf);
 	}
