@@ -3,6 +3,7 @@
 //
 
 #include <stdarg.h>
+#include <stdio.h>
 
 #include <avr/io.h>
 #include <avr/wdt.h>
@@ -11,8 +12,8 @@
 #include <cli/cli.h>
 
 // Commands
-int restart(cli* c, const char* name, ...);
-int dim(cli* c, const char* name, ...);
+int restart(cli* c, char *argv[]);
+int dim(cli* c, char *argv[]);
 
 int main() {
 	cli *c = new_cli(new_usart_reader(), new_usart_writer());
@@ -20,11 +21,7 @@ int main() {
 	// Add handlers
 	c->add_handler(c, "restart", restart);
 	c->add_handler(c, "dim", dim);
-	c->add_handler(c, "aim", dim);
 	c->add_handler(c, "reboot", restart);
-	c->add_handler(c, "bimax", restart);
-	c->add_handler(c, "zootopia", restart);
-	c->add_handler(c, "climax", restart);
 
 	// Run CLI
 	c->execute(c);
@@ -32,15 +29,19 @@ int main() {
 	return 0;
 }
 
-int restart(cli* c, const char* name, ...) {
-	c->puts(c, "Rebooting...");
+int restart(cli* c, char *argv[]) {
+	c->puts(c, "Rebooting...\r\n");
 
 	wdt_enable(WDTO_15MS);
 	for (;;);
 }
 
-int dim(cli* c, const char* name, ...) {
-	c->puts(c, "Starting dimmer...");
+int dim(cli* c, char *argv[]) {
+	c->puts(c, "Starting dimmer...\r\n");
+
+	char buf[64];
+	sprintf(buf, "Args: %s %s\r\n", argv[0], argv[1]);
+	c->puts(c, buf);
 
 	return 0;
 }

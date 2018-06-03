@@ -74,15 +74,27 @@ static int cli_gets(cli *c, char *str) {
 }
 
 static void cli_handle(cli *c, const char *command) {
-	char buf[300] = "";
+	// Parse command
+	int count = 0;
+	char *argv[25];
+	char *cmd = strdup(command);
+	while (NULL != (argv[count++] = strsep(&cmd, " ")));
 
-	// TODO: Dispatch command
-	{
+	if (count > 0) {
+		for (int i = 0; i < c->commands_count; i++) {
+			if (0 == strcmp(c->commands[i].name, argv[0])) {
+				c->commands[i].exec(c, argv);
+
+				// TODO: Read status
+
+				return;
+			}
+		}
+
+		char buf[128] = "";
 		sprintf(buf, "command not found: %s\r\n", command);
+		cli_puts(c, buf);
 	}
-
-	// Write results
-	cli_puts(c, buf);
 }
 
 static void cli_execute(cli *c) {
@@ -98,23 +110,22 @@ static void cli_execute(cli *c) {
 	}
 }
 
-static void cli_add_handler(cli *c, const char *name, command fn) {
-	static int count;
+static void cli_add_handler(cli *c, const char *name, executable fn) {
+	command cmd = {
+		.name = name,
+		.exec = fn,
+	};
 
-	count++;
-
-	c->handlers = (command*) realloc(c->handlers, count * sizeof(command));
-	c->handlers[count - 1] = fn;
-
-	c->cmd_names = (const char**) realloc(c->cmd_names, count * sizeof(const char*));
-	for (int i = 0; i < count; i++) {
+	c->commands_count++;
+	c->commands = (command *) realloc(c->commands, c->commands_count * sizeof(command));
+	for (int i = 0; i < c->commands_count; i++) {
 		// Last empty home or current home
-		if (count == (i + 1) || strcmp(c->cmd_names[i], name) > 0) {
-			for (int j = count - 1; j > i; j--) {
-				c->cmd_names[j] = c->cmd_names[j - 1];
+		if (c->commands_count == (i + 1) || strcmp(c->commands[i].name, name) > 0) {
+			for (int j = c->commands_count - 1; j > i; j--) {
+				c->commands[j] = c->commands[j - 1];
 			}
 
-			c->cmd_names[i] = name;
+			c->commands[i] = cmd;
 
 			break;
 		}
@@ -122,13 +133,14 @@ static void cli_add_handler(cli *c, const char *name, command fn) {
 }
 
 extern cli *new_cli(io_reader *r, io_writer *w) {
-	cli *c = (cli*) malloc(sizeof(cli));
+	cli *c = (cli *) malloc(sizeof(cli));
 	c->w = w;
 	c->r = r;
 	c->add_handler = cli_add_handler;
 	c->execute = cli_execute;
 	c->puts = cli_puts;
 	c->gets = cli_gets;
+	c->commands_count = 0;
 
 	return c;
 }

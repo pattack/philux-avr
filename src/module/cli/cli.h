@@ -9,16 +9,23 @@
 
 typedef struct cli cli;
 
-typedef int (*command)(cli *c, const char *name, ...);
+typedef struct command command;
+
+typedef int (*executable)(cli *c, char *argv[]);
+
+struct command {
+		const char *name;
+		executable exec;
+};
 
 struct cli {
 		io_reader *r;
 		io_writer *w;
 
-		const char** cmd_names;
-		command* handlers;
+		int commands_count;
+		command *commands;
 
-		void (*add_handler)(cli *, const char *name, command fn);
+		void (*add_handler)(cli *, const char *name, executable fn);
 
 		void (*execute)(cli *);
 
