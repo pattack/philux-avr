@@ -9,7 +9,7 @@
 #include "cli.h"
 #include <io/io.h>
 
-static int cli_puts(cli *c, char *str) {
+static int cli_puts(cli *c, const char *str) {
 	int count;
 
 	for (count = 0; '\0' != str[count]; count++) {
@@ -91,9 +91,9 @@ static void cli_handle(cli *c, const char *command) {
 			}
 		}
 
-		char buf[128] = "";
-		sprintf(buf, "command not found: %s\r\n", command);
-		cli_puts(c, buf);
+		cli_puts(c, "command not found: ");
+		cli_puts(c, command);
+		cli_puts(c, "\r\n");
 	}
 }
 

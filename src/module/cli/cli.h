@@ -29,7 +29,7 @@ struct cli {
 
 		void (*execute)(cli *);
 
-		int (*puts)(cli *, char *str);
+		int (*puts)(cli *, const char *str);
 
 		int (*gets)(cli *, char *str);
 };
