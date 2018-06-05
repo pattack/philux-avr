@@ -21,8 +21,11 @@ int dim(cli *c, char *argv[]);
 
 int help(cli *c, char *argv[]);
 
+cli *debug;
+
 int main() {
 	cli *c = new_cli(new_usart_reader(), new_usart_writer());
+	debug = c;
 
 	// Add handlers
 	c->add_handler(c, "restart", restart);
@@ -68,24 +71,20 @@ int dim(cli *c, char *argv[]) {
 	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d timer ticks (CLK/%d)\r\n", angle, 0xb0, F_CPU, (int) delay_ms, timer_ceil, prescaler);
 	c->puts(c, buf);
 
-	// PortC.0: output
-	DDRC |= 1;
+	// Setup Trigger Signaller
+	DDRC |= (1 << DDC0); // PortC.0: output
+	PORTC &= ~(1 << PORTC0); // PortC.0 = 0
 
-	// PortC.0 = 0
-	PORTC &= ~(1 << PORTC0);
+	// Setup Timer
+	TCCR0 = (1 << WGM01); // Disable Timer0 and Set for CTC Mode
+	TCNT0 = 0; // Reset Timer0 Value
+	OCR0 = timer_ceil; // Set Timer0 Max Value
+	TIMSK |= (1 << TOIE0); // Enable Timer0 overflow interrupt
 
-	OCR0 = timer_ceil;
-
-	// CTC Mode
-	TCCR0 = (1 << WGM01);
-
-	// enable timer0 overflow interrupt
-	TIMSK |= (1 << TOIE0);
-
-	// Enable INT0
+	// External Interrupt Setup
 	DDRD &= ~(1 << DDC2); // Set PinC.2 as Input
-	MCUCR = (1 << ISC01) | (1 << ISC00); // Enable INT0 in Raising edge
-	GICR |= (1 << INT0);
+	MCUCR = (1 << ISC01) | (1 << ISC00); // Enable INT0 on Raising edge
+	GICR |= (1 << INT0); // Enable INT0
 
 	// enable global interrupts
 	sei();
@@ -112,5 +111,5 @@ ISR(TIMER0_OVF_vect) {
 	TCCR0 &= ~((1 << CS02) | (1 << CS01) | (1 << CS00));
 
 	// PortC.0 = 1
-	PORTC |= 1 << PORTC0;
+	PORTC |= (1 << PORTC0);
 }
