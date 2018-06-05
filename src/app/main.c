@@ -43,16 +43,27 @@ int restart(cli *c, char *argv[]) {
 	for (;;);
 }
 
-int dim(cli *c, char *argv[]) {
-	c->puts(c, "Starting dimmer...\r\n");
+uint8_t timer0_cs0 = (1 << CS02) | (1 << CS00);
 
-	uint16_t prescaler = 1024;
+int dim(cli *c, char *argv[]) {
 	uint8_t angle = (uint8_t) (strtol(argv[1], (char **) NULL, 10) % 180);
 	double delay_ms = angle / 18.0;
+	uint16_t prescaler = 1024;
+	timer0_cs0 = (1 << CS02) | (1 << CS00);
+	if (angle < 5) {
+		timer0_cs0 = (1 << CS01);
+		prescaler = 8;
+	} else if (angle < 37) {
+		timer0_cs0 = (1 << CS01) | (1 << CS00);
+		prescaler = 64;
+	} else if (angle < 147) {
+		timer0_cs0 = (1 << CS02);
+		prescaler = 256;
+	}
 	uint8_t timer_ceil = (uint8_t) (delay_ms * ((F_CPU / prescaler) / 1000.0));
 
 	char buf[255];
-	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d clocks\r\n", angle, 0xb0, F_CPU, (int) delay_ms, timer_ceil);
+	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d timer ticks (CLK/%d)\r\n", angle, 0xb0, F_CPU, (int) delay_ms, timer_ceil, prescaler);
 	c->puts(c, buf);
 
 	// PortC.0: output
@@ -88,7 +99,7 @@ int help(cli *c, char *argv[]) {
 
 ISR(INT0_vect) {
 	// Enable Timer0 with 1024 Prescaler
-	TCCR0 |= (1 << CS02) | (1 << CS00);
+	TCCR0 |= timer0_cs0;
 }
 
 ISR(TIMER0_OVF_vect) {
