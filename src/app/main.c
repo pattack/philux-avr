@@ -8,7 +8,6 @@
 
 #include <avr/io.h>
 #include <avr/wdt.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
 
 #include <usart/usart.h>
@@ -50,7 +49,7 @@ uint8_t timer0_cs0 = (1 << CS02) | (1 << CS00);
 
 int dim(cli *c, char *argv[]) {
 	uint8_t angle = (uint8_t) (strtol(argv[1], (char **) NULL, 10) % 180);
-	double delay_ms = angle / 18.0;
+	double time_shift_ms = angle / 18.0;
 
 	timer0_cs0 = (1 << CS02) | (1 << CS00);
 	uint16_t prescaler = 1024;
@@ -65,10 +64,10 @@ int dim(cli *c, char *argv[]) {
 		prescaler = 256;
 	}
 
-	uint8_t timer_ceil = (uint8_t) (delay_ms * ((F_CPU / prescaler) / 1000.0));
+	uint8_t timer_ceil = (uint8_t) (time_shift_ms * ((F_CPU / prescaler) / 1000.0));
 
 	char buf[255];
-	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d timer ticks (CLK/%d)\r\n", angle, 0xb0, F_CPU, (int) delay_ms, timer_ceil, prescaler);
+	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d timer ticks (CLK/%d)\r\n", angle, 0xb0, F_CPU, (int) time_shift_ms, timer_ceil, prescaler);
 	c->puts(c, buf);
 
 	// Setup Trigger Signaller
