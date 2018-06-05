@@ -46,11 +46,13 @@ int restart(cli *c, char *argv[]) {
 int dim(cli *c, char *argv[]) {
 	c->puts(c, "Starting dimmer...\r\n");
 
-	int angle = (int) strtol(argv[1], (char **) NULL, 10);
-	double skip = angle * (10e-3 / 180);
+	uint16_t prescaler = 1024;
+	uint8_t angle = (uint8_t) (strtol(argv[1], (char **) NULL, 10) % 180);
+	double delay_ms = angle / 18.0;
+	uint8_t timer_ceil = (uint8_t) (delay_ms * ((F_CPU / prescaler) / 1000.0));
 
 	char buf[255];
-	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: %fms\r\n", angle, 0xb0, F_CPU, skip);
+	sprintf(buf, "Configure dimmer angle on: %d%lc @ %luHz: ~%dms --> %d clocks\r\n", angle, 0xb0, F_CPU, (int) delay_ms, timer_ceil);
 	c->puts(c, buf);
 
 	// PortC.0: output
@@ -59,8 +61,7 @@ int dim(cli *c, char *argv[]) {
 	// PortC.0 = 0
 	PORTC &= 254;
 
-	uint16_t prescaler = 1024;
-	OCR0 = (uint8_t) (skip * (F_CPU / prescaler));
+	OCR0 = timer_ceil;
 
 	// CTC Mode
 	TCCR0 = (1 << WGM01);

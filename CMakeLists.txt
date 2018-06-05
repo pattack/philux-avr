@@ -133,6 +133,7 @@ add_definitions("-fshort-enums")
 add_definitions("-Os")
 add_definitions("-Wall")
 add_definitions("-Werror")
+add_definitions("-Wl,-u,vfprintf")
 add_definitions("-pedantic")
 add_definitions("-pedantic-errors")
 add_definitions("-funsigned-char")
@@ -157,7 +158,7 @@ add_avr_library(cli src/module/cli/cli.c)
 add_avr_library(usart src/module/usart/usart.c)
 
 add_avr_executable(philuxavr src/app/main.c)
-target_link_libraries(philuxavr-${AVR_MCU}.elf cli-${AVR_MCU} usart-${AVR_MCU})
+target_link_libraries(philuxavr-${AVR_MCU}.elf cli-${AVR_MCU} usart-${AVR_MCU} printf_flt m)
 
 ##########################################################################
 # use default documentation target
