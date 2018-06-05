@@ -48,8 +48,9 @@ uint8_t timer0_cs0 = (1 << CS02) | (1 << CS00);
 int dim(cli *c, char *argv[]) {
 	uint8_t angle = (uint8_t) (strtol(argv[1], (char **) NULL, 10) % 180);
 	double delay_ms = angle / 18.0;
-	uint16_t prescaler = 1024;
+
 	timer0_cs0 = (1 << CS02) | (1 << CS00);
+	uint16_t prescaler = 1024;
 	if (angle < 5) {
 		timer0_cs0 = (1 << CS01);
 		prescaler = 8;
@@ -60,6 +61,7 @@ int dim(cli *c, char *argv[]) {
 		timer0_cs0 = (1 << CS02);
 		prescaler = 256;
 	}
+
 	uint8_t timer_ceil = (uint8_t) (delay_ms * ((F_CPU / prescaler) / 1000.0));
 
 	char buf[255];
@@ -70,7 +72,7 @@ int dim(cli *c, char *argv[]) {
 	DDRC |= 1;
 
 	// PortC.0 = 0
-	PORTC &= 254;
+	PORTC &= ~(1 << PORTC0);
 
 	OCR0 = timer_ceil;
 
@@ -81,7 +83,7 @@ int dim(cli *c, char *argv[]) {
 	TIMSK |= (1 << TOIE0);
 
 	// Enable INT0
-	DDRD &= 251; // Set PortC.2 as Input
+	DDRD &= ~(1 << DDC2); // Set PinC.2 as Input
 	MCUCR = (1 << ISC01) | (1 << ISC00); // Enable INT0 in Raising edge
 	GICR |= (1 << INT0);
 
@@ -98,15 +100,17 @@ int help(cli *c, char *argv[]) {
 }
 
 ISR(INT0_vect) {
-	// Enable Timer0 with 1024 Prescaler
+	// Enable Timer0 with Prescaler
 	TCCR0 |= timer0_cs0;
+
+	// PortC.0 = 0
+	PORTC &= ~(1 << PORTC0);
 }
 
 ISR(TIMER0_OVF_vect) {
 	// Disable Timer: CS00:2 = 0
-	TCCR0 &= 248;
+	TCCR0 &= ~((1 << CS02) | (1 << CS01) | (1 << CS00));
 
-	PORTC |= 1;
-	_delay_us(500);
-	PORTC &= 0;
+	// PortC.0 = 1
+	PORTC |= 1 << PORTC0;
 }
