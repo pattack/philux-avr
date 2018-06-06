@@ -82,7 +82,7 @@ int dim(cli *c, char *argv[]) {
 
 	// External Interrupt Setup
 	DDRD &= ~(1 << DDC2); // Set PinC.2 as Input
-	MCUCR = (1 << ISC01) | (1 << ISC00); // Enable INT0 on Raising edge
+	MCUCR &= ~((1 << ISC01) | (1 << ISC00)); // Enable INT0 on Low Level
 	GICR |= (1 << INT0); // Enable INT0
 
 	// enable global interrupts
@@ -101,14 +101,14 @@ ISR(INT0_vect) {
 	// Enable Timer0 with Prescaler
 	TCCR0 |= timer0_cs0;
 
-	// PortC.0 = 0
-	PORTC &= ~(1 << PORTC0);
+	// PortC.0 = 1
+	PORTC |= (1 << PORTC0);
 }
 
 ISR(TIMER0_OVF_vect) {
 	// Disable Timer: CS00:2 = 0
 	TCCR0 &= ~((1 << CS02) | (1 << CS01) | (1 << CS00));
 
-	// PortC.0 = 1
-	PORTC |= (1 << PORTC0);
+	// PortC.0 = 0
+	PORTC &= ~(1 << PORTC0);
 }
