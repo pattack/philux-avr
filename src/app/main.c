@@ -93,6 +93,9 @@ int dim(cli *c, char *argv[]) {
 
 int help(cli *c, char *argv[]) {
 	c->puts(c, "This is PhiLUX\r\n");
+	c->puts(c, "Available commands:\r\n");
+	c->puts(c, "- dim angle\r\n");
+	c->puts(c, "- reboot\r\n");
 
 	return 0;
 }

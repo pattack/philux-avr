@@ -91,9 +91,11 @@ static void cli_handle(cli *c, const char *command) {
 			}
 		}
 
-		cli_puts(c, "command not found: ");
-		cli_puts(c, command);
-		cli_puts(c, "\r\n");
+		if (strlen(argv[0]) > 0) {
+			char buf[255];
+			sprintf(buf, "command not found: %s\r\n", argv[0]);
+			c->puts(c, buf);
+		}
 	}
 }
 
@@ -141,6 +143,7 @@ extern cli *new_cli(io_reader *r, io_writer *w) {
 	c->puts = cli_puts;
 	c->gets = cli_gets;
 	c->commands_count = 0;
+	c->commands = (command *) malloc(sizeof(command));
 
 	return c;
 }
