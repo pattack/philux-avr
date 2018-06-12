@@ -22,14 +22,14 @@ cmake_minimum_required(VERSION 2.8)
 set(AVR_UPLOADTOOL avrdude)
 set(AVR_PROGRAMMER ponyser)
 set(AVR_UPLOADTOOL_PORT /dev/ttyUSB0)
-set(AVR_UPLOADTOOL_OPTIONS -i 1000 -F -B .5 -b 9600)
+set(AVR_UPLOADTOOL_OPTIONS -i 400 -F -B .5 -b 19200)
 
 ##########################################################################
 # AVR and fuses needs to be set
 ##########################################################################
 set(AVR_MCU atmega32)
 set(AVR_H_FUSE 0xd9)
-set(AVR_L_FUSE 0xc3)
+set(AVR_L_FUSE 0xc4)
 
 ### END TOOLCHAIN SETUP AREA #############################################
 
