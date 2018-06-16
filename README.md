@@ -1,6 +1,16 @@
+* Run simulation
+* Linux
+```bash
+sudo setcap cap_net_raw,cap_net_admin=epi `which wine-preloader`
+```
+
+* Windows
+
 * Configure
 ```sh
-cmake -DCMAKE_TOOLCHAIN_FILE=avr.cmake --build cmake-build-debug
+mkdir cmake-build-debug
+cd cmake-build-debug
+cmake -DCMAKE_TOOLCHAIN_FILE=avr.cmake ../
 ```
 
 * Build
