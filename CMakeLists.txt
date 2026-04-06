@@ -9,12 +9,14 @@
 # Matthias Kleemann
 ##########################################################################
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.16)
 
 ### TOOLCHAIN SETUP AREA #################################################
 # Set any variables used in the toolchain prior project() call. In that
 # case they are already set and used.
 ##########################################################################
+
+set(CMAKE_TOOLCHAIN_FILE avr.toolchain.cmake)
 
 ##########################################################################
 # tools to beused for programming the AVR
@@ -157,8 +159,8 @@ include_directories(src/module)
 add_avr_library(cli src/module/cli/cli.c)
 add_avr_library(usart src/module/usart/usart.c)
 
-add_avr_executable(philuxavr src/app/main.c)
-target_link_libraries(philuxavr-${AVR_MCU}.elf cli-${AVR_MCU} usart-${AVR_MCU} printf_flt m)
+add_avr_executable(firmware src/app/main.c)
+target_link_libraries(firmware-${AVR_MCU}.elf cli-${AVR_MCU} usart-${AVR_MCU} printf_flt m)
 
 ##########################################################################
 # use default documentation target

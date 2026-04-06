@@ -10,14 +10,13 @@ Philux is a high-power, trailing edge dimmer remotely controlled on wired/wirele
 
 1. Configure
 ```sh
-mkdir cmake-build-debug
-cd cmake-build-debug
-cmake -DCMAKE_TOOLCHAIN_FILE=avr.cmake ../
+cmake --preset=philux-avr
 ```
 
 2. Build
+After configuring the project run following command in root directory:
 ```sh
-cmake --build cmake-build-debug --target philuxavr -- -j 2
+cmake --build build/philux-avr
 ```
 
 ## Upload

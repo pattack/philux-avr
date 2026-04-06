@@ -8,4 +8,4 @@
 .project
 .settings/
 
-cmake-build-*/
+build/
